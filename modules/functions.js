@@ -1,5 +1,7 @@
 const { CustomError } = require("./CustomError")
 const { existsSync, readdir } = require("fs")
+const { DiscordClient } = require("./discordclient")
+const { Collection } = require("discord.js")
 /**
  * @module functions
  */
@@ -41,7 +43,7 @@ exports.loadEvents = (eventdir, eventemitter) => {
     var readeventdir = "./" + eventdir
     if (existsSync(readeventdir)) {
         readdir(`./${readeventdir}/`, (err, files) => {
-            if (err) return console.error("Error reading discord events directory:", err);
+            if (err) return console.error("Error reading events directory:", err);
             files.forEach(file => {
                 if (!(file.endsWith(".js"))) return;
                 let eventname = file.split(".")[0];
@@ -50,6 +52,31 @@ exports.loadEvents = (eventdir, eventemitter) => {
             });
         });
     } else throw new CustomError("LoadError", `EventDirectory ${eventdir} does not exist.`)
+}
+/**
+ * 
+ * @param {Collection} commandmap 
+ * @param {string} commanddir 
+ * @param {DiscordClient} discordclient 
+ */
+exports.loadSlashCommands = function (commandmap, commanddir, discordclient) {
+    var readcommanddir = "./" + commanddir;
+    if (existsSync(readcommanddir)) {
+        readdir(`./${readcommanddir}/`, (err, files) => {
+            if (err) return console.error("Error reading slash command directory:", err);
+            files.forEach((file) => {
+                if (!(file.endsWith(".js"))) return;
+                let filename = file.split(".")[0];
+                const slashcommand = require(`../${commanddir}/${filename}`);
+                discordclient.application.commands.create({
+                    name: slashcommand.name,
+                    description: slashcommand.description
+                });
+                commandmap.set(slashcommand.name, slashcommand);
+                console.log(`listening to slash command ${slashcommand.name}`)
+            })
+        })
+    }
 }
 
 /**

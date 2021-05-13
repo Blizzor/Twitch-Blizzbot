@@ -4,5 +4,4 @@ data
 config.json
 start.sh
 channellogs/
-jsdoc
 package-lock.json

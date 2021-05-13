@@ -1,5 +1,5 @@
-const { Client, Collection } = require("discord.js");
-const { loadCommands, loadEvents } = require("./functions")
+const { Client, Collection, Intents } = require("discord.js");
+const { loadCommands, loadEvents, loadSlashCommands } = require("./functions")
 
 /**
  * @typedef {Object} config
@@ -22,12 +22,11 @@ const { loadCommands, loadEvents } = require("./functions")
  * @param {started} boolean
  * @param {TextChannel} blchannel
  * @param {TextChannel} statuschannel channel for sending status logs
- * @emits discord:message
- * @emits discord:ready 
  */
 exports.DiscordClient = class DiscordClient extends Client {
     config;
     commands = new Collection;
+    slashCommands = new Collection;
     helplist = [];
     clients;
     started = false;
@@ -39,17 +38,18 @@ exports.DiscordClient = class DiscordClient extends Client {
      * @param {config} config discord part of the config file
      */
     constructor(config) {
-        super();
+        super({ intents: Intents.ALL });
         this.config = config;
-        loadCommands(this.commands, "commands/discord")
-        loadEvents("events/discord", this)
-        console.log("logging in")
+        loadCommands(this.commands, "commands/discord");
+        loadEvents("events/discord", this);
+        loadSlashCommands(this.slashCommands, "commands/discord-slash", this);
+        console.log("logging in");
         this.login(config.token);
     }
     /**
      * changes the channel topics of the blacklist, relay and status channels
      */
-    async channelTopic () {
+    async channelTopic() {
         this.clients.console.write(await (await this.channels.fetch(this.config.channels.blacklist)).setTopic(":green_circle: Hier wir die Blacklist vom Bot angezeigt"))
         this.clients.console.write(await (await this.channels.fetch(this.config.channels.relay)).setTopic(":green_circle: Nachrichten werden über den Bot ausgegeben."))
         this.clients.console.write(await (await this.channels.fetch(this.config.channels.adminCommands)).setTopic(":green_circle: Commands für den Twitch-Bot."))
