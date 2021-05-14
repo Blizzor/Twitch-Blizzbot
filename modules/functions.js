@@ -70,7 +70,8 @@ exports.loadSlashCommands = function (commandmap, commanddir, discordclient) {
                 const slashcommand = require(`../${commanddir}/${filename}`);
                 discordclient.application.commands.create({
                     name: slashcommand.name,
-                    description: slashcommand.description
+                    description: slashcommand.description,
+                    options: slashcommand.options
                 });
                 commandmap.set(slashcommand.name, slashcommand);
                 console.log(`listening to slash command ${slashcommand.name}`)
