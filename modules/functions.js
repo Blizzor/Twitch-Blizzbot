@@ -12,7 +12,7 @@ const { Collection } = require("discord.js")
  * @param {string[]} helplist 
  * @throws {LoadError} missing command directory
  */
-exports.loadCommands = (commandmap, commanddir, helplist) => {
+exports.loadCommands = function (commandmap, commanddir, helplist) {
     var readcommanddir = "./" + commanddir
     if (existsSync(readcommanddir)) {
         readdir(`./${readcommanddir}/`, (err, files) => {
@@ -39,7 +39,7 @@ exports.loadCommands = (commandmap, commanddir, helplist) => {
  * @example loadEvents("events/twitch", client)
  * @throws {LoadError} missing command directory
  */
-exports.loadEvents = (eventdir, eventemitter) => {
+exports.loadEvents = function (eventdir, eventemitter) {
     var readeventdir = "./" + eventdir
     if (existsSync(readeventdir)) {
         readdir(`./${readeventdir}/`, (err, files) => {
@@ -85,7 +85,7 @@ exports.loadSlashCommands = function (commandmap, commanddir, discordclient) {
  * @returns {string} Watchtime String
  * @throws {TypeError} Watchtime has to be a Number
  */
-exports.calcWatchtime = (watchtime) => {
+exports.calcWatchtime = function (watchtime) {
     if (!watchtime instanceof Number) throw new CustomError("TypeError", "Watchtime has to be a Number")
     var timeTotalMinutes = Math.floor(watchtime / 2)
     var timeMinutes = timeTotalMinutes % 60

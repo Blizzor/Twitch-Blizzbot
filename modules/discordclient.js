@@ -1,5 +1,5 @@
 const { Client, Collection, Intents } = require("discord.js");
-const { loadCommands, loadEvents, loadSlashCommands } = require("./functions")
+const functions = require("./functions")
 
 /**
  * @typedef {Object} config
@@ -40,9 +40,9 @@ exports.DiscordClient = class DiscordClient extends Client {
     constructor(config) {
         super({ intents: Intents.ALL });
         this.config = config;
-        loadCommands(this.commands, "commands/discord");
-        loadEvents("events/discord", this);
-        loadSlashCommands(this.slashCommands, "commands/discord-slash", this);
+        functions.loadCommands(this.commands, "commands/discord");
+        functions.loadEvents("events/discord", this);
+        this.once("ready", () => functions.loadSlashCommands(this.slashCommands, "commands/discord-slash", this));
         console.log("logging in");
         this.login(config.token);
     }
